@@ -11,16 +11,24 @@ export class TasksController {
   constructor(private readonly tasksService: TasksService) { }
 
   @Post()
-  create(@Body('title') title: string,@Req() req: any) {
-    const userId = req.user.userId
-    return this.tasksService.create(title, userId);
+  create(
+    @Body() body: { title: string; dueDate?: string },
+    @Req() req: any
+  ) {
+    const userId = req.user.userId;
+    const { title, dueDate } = body;
+console.log('Request User:', req.user);
+
+    return this.tasksService.create(title, userId, dueDate);
   }
 
   @Get()
-  @UseGuards()
-  findAll(@Req() req) {
-    return this.tasksService.findAll(req.user.userId);
-  }
+
+findAll(@Req() req: any) {
+  const userId = req.user.userId; 
+  console.log('Fetching tasks for user:', userId);
+  return this.tasksService.findAll(userId);
+}
 
   @Get(':id')
   findOne(@Param('id') id: string) {

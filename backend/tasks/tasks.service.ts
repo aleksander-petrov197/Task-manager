@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Task } from './entities/task.entity';
@@ -16,26 +16,56 @@ export class TasksService {
     if (!task) throw new NotFoundException(`Task with id ${id} not found`);
     return task;
   }
-  async update(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {
-    const task = await this.findOne(id);
-    const updated = Object.assign(task, updateTaskDto);
-    return this.taskRepository.save(updated);
-  }
+async update(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {
+  // 1. Log exactly what the service sees
+  console.log(`Updating Task ${id} with:`, updateTaskDto);
+
+  // 2. Direct update to the database
+  await this.taskRepository.update(id, {
+    title: updateTaskDto.title,
+    position: updateTaskDto.position // Force the position write
+  });
+
+  // 3. Return the updated task
+  return this.findOne(id);
+}
   async remove(id: number): Promise<Task> {
     const task = await this.findOne(id);
     return this.taskRepository.remove(task);
   }
   async findAll(userId: number): Promise<Task[]> {
     return await this.taskRepository.find({
-      where: { user: { id: userId } }
+      where: { user: { id: userId } },
+      order: {position: 'ASC'}
     });
   }
-  async create(title: string, userId: number) {
+  async create(title: string, userId: number, dueDate?: string) {
+
+    if(dueDate){
+      const today = new Date();
+      today.setHours(0,0,0,0)
+      const selectDate = new Date(dueDate);
+      const count = await this.taskRepository.count({
+        where:{user:{id: userId}}
+      });
+
+      if(selectDate < today){
+        throw new BadRequestException('You cannot set a task for a past date.')
+      }
+    }
     const newTask = this.taskRepository.create({
       title,
-      user: { id: userId }
+      dueDate,
+      user: { id: userId },
+      status: 'OPEN',
     });
     return await this.taskRepository.save(newTask);
   }
-
+async reorderTasks(ids: number[]) {
+  // Loop through the IDs and update their positions in one go
+  const updates = ids.map((id, index) => 
+    this.taskRepository.update(id, { position: index })
+  );
+  return await Promise.all(updates);
+}
 }

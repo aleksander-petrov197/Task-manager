@@ -19,7 +19,7 @@ export class RegisterComponent {
   constructor(private authService: AuthService, private router: Router) { }
 
   onRegister() {
-    if(this.email.toLowerCase() === this.password.toLocaleLowerCase()){
+    if(this.email.toLowerCase() === this.password.toLowerCase()){
       this.errorMessage = "Security Alert: Your password cannot be the same as your email.";
       return;
     }

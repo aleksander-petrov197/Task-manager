@@ -12,7 +12,12 @@ export class Task {
   description: string;
 
   @Column({ default: 'pending' })
+
   status: string;
+  @Column({type: 'date', nullable: true})
+  dueDate: string
+  @Column({default: 0})
+  position: number;
 
   @ManyToOne(() => User, (user) => user.tasks)
   user: User

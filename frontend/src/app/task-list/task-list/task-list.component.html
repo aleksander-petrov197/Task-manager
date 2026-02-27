@@ -5,8 +5,9 @@
   </div>
 
   <div class="add-task">
-    <input type="text" [(ngModel)]="newTaskTitle" name="newTask" placeholder="Add a new task..." (keyup.enter)="addTasks()">
-    <button class="btn-add" (click)="addTasks()">Add</button>
+    <input type="text" [(ngModel)]="newTaskTitle" name="newTask" placeholder="Add a new task..." (keyup.enter)="addTask()">
+    <input type="date" [(ngModel)]="newTaskDate" [min]="minDate" name="dueDate">
+    <button class="btn-add" (click)="addTask()" [disabled]="!newTaskTitle || !newTaskTitle.trim()">Add</button>
   </div>
 
   <div class="filter-controls">
@@ -15,17 +16,41 @@
     <button [class.active]="filter() === 'DONE'" (click) = "setFilter('DONE')">Done</button>
   </div>
 
-  <ul>
+<ul cdkDropList
+[cdkDropListDisabled]="filter() !== 'ALL'"
+(cdkDropListDropped)="drop($event)">
     @for (task of filteredTasks(); track task.id) {
-      <li [class.completed]="task.status === 'DONE'">
-        <div class="task-info">
-          <input type="checkbox" [checked]="task.status === 'DONE'" (change)="toggleDone(task)">
-          <span>{{ task.title }}</span>
-        </div>
-        <div class="actions">
-          <button class="btn-edit" (click)="editTask(task)">Edit</button>
-          <button class="btn-delete" (click)="deleteTask(task.id)">Delete</button>
-        </div>
+      <li cdkDrag [class.completed]="task.status === 'DONE'">
+        <div class="drag-handle" cdkDragHandle>::</div>
+        @if (!task.isEditing) {
+          <div class="task-info">
+            <input type="checkbox" [checked]="task.status === 'DONE'" (change)="toggleDone(task)">
+            <div class="text-group">
+              <span class="task-title">{{ task.title }}</span>
+              <span class="due-date" [class.overdue]="isOverdue(task.dueDate) && task.status !== 'DONE'">
+                Due: {{ task.dueDate ? (task.dueDate | date:'mediumDate') : 'No date' }}
+                @if (isOverdue(task.dueDate) && task.status !== 'DONE') {
+                  <span class="overdue-badge">Overdue</span>
+                }
+              </span>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn-edit" (click)="task.isEditing = true">Edit</button>
+            <button class="btn-delete" (click)="deleteTask(task.id)">Delete</button>
+          </div>
+        } 
+        
+     @else {
+  <div class="edit-mode-container">
+    <input type="text" [(ngModel)]="task.title" class="edit-input">
+    <input type="date" [(ngModel)]="task.dueDate" [min]="minDate" class="edit-date">
+    <div class="edit-actions">
+      <button class="btn-save" (click)="saveEdit(task)">Save</button>
+      <button class="btn-cancel" (click)="task.isEditing = false">Cancel</button>
+    </div>
+  </div>
+}
       </li>
     } @empty {
       <p style="text-align: center; color: #94a3b8; font-size: 14px;">Your list is empty!</p>

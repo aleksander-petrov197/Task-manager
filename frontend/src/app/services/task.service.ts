@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient,HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
@@ -7,16 +7,30 @@ import { Observable } from 'rxjs';
 export class TaskService {
 private apiUrl = 'http://localhost:3000/tasks';
   constructor(private http: HttpClient) { }
-  getTasks():Observable<any[]>{
-    return this.http.get<any[]>(this.apiUrl);
+  private getHeaders(){
+    const token = localStorage.getItem('token');
+    return{
+      headers: new HttpHeaders({
+        'Authorization': `Bearer ${token}`
+      })
+    }
   }
-  addTasks(title: string): Observable<any>{
-   return this.http.post(this.apiUrl, { title });
+  
+  getTasks(): Observable<any[]> {
+  const token = localStorage.getItem('token');
+  const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+  
+ 
+  return this.http.get<any[]>(this.apiUrl, { headers });
+}
+  addTask(title: string, dueDate?: string): Observable<any>{
+   return this.http.post(this.apiUrl, { title, dueDate }, this.getHeaders());
   }
   deleteTask(id: number): Observable<any>{
-    return this.http.delete(`${this.apiUrl}/${id}`)
+    return this.http.delete(`${this.apiUrl}/${id}`, this.getHeaders())
   }
   updateTask(id: number, updates: Partial<any>): Observable<any>{
-    return this.http.patch(`${this.apiUrl}/${id}`, updates);
+    return this.http.patch(`${this.apiUrl}/${id}`, updates, this.getHeaders());
   }
+  
 }

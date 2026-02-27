@@ -180,7 +180,7 @@ span {
 }
 
 .header-row {
-  display: flex; /* This puts Title and Button on the same line */
+  display: flex; 
   justify-content: space-between; 
   align-items: center;
   border-bottom: 2px solid #f1f5f9;
@@ -189,16 +189,106 @@ span {
 }
 
 .btn-logout {
-  background-color: #ff4d4d; /* Bright Red */
+  background-color: #ff4d4d; 
   color: white !important;
   border: none;
   padding: 8px 16px;
   border-radius: 6px;
   font-weight: bold;
   cursor: pointer;
-  z-index: 100; /* Ensures it stays on top */
+  z-index: 100; 
 }
 
 .btn-logout:hover {
   background-color: #cc0000;
+}
+
+.edit-mode-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 5px 0;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+
+.edit-input {
+  flex: 2;
+  padding: 8px 12px;
+  border: 2px solid #3b82f6; 
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+}
+
+
+.edit-date {
+  flex: 1;
+  padding: 7px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #475569;
+}
+
+
+.edit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-save {
+  background-color: #22c55e; 
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-save:hover {
+  background-color: #16a34a;
+}
+
+.btn-cancel {
+  background-color: #94a3b8; 
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-cancel:hover {
+  background-color: #64748b;
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.drag-handle {
+  cursor: grab;
+  padding-right: 10px;
+  color: #94a3b8;
+  font-size: 18px;
+  user-select: none; 
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.cdk-drag-preview {
+  box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+  background: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  padding: 10px;
 }
