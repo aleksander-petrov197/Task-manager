@@ -34,7 +34,7 @@ export class TaskListComponent implements OnInit {
   loadTasks() {
   this.taskService.getTasks().subscribe({
     next: (data) => {
-      this.tasks.set(data); // This updates the signal with the DB's sorted order
+      this.tasks.set(data); 
     },
     error: (err) => console.error('Could not load tasks', err)
   });
@@ -42,21 +42,21 @@ export class TaskListComponent implements OnInit {
 
 
 addTask() {
-  this.errorMessage = null; // Clear previous errors
+  this.errorMessage = null;
 
-  // 1. Check for Title
+ 
   if (!this.newTaskTitle || !this.newTaskTitle.trim()) {
     this.errorMessage = "Please enter a task title.";
     return;
   }
 
-  // 2. Check for Date (if you want the year/date to be mandatory)
+  
   if (!this.newTaskDate) {
     this.errorMessage = "Please select a due date.";
     return;
   }
 
-  // 3. If both are present, call the service
+
   this.taskService.addTask(this.newTaskTitle, this.newTaskDate).subscribe({
     next: () => {
       this.newTaskTitle = '';
@@ -94,12 +94,14 @@ saveEdit(task: any) {
   }
     this.taskService.deleteTask(id).subscribe(() => this.loadTasks());
   }
-  toggleDone(task: any) {
-    const newStatus = task.status === 'DONE' ? 'OPEN' : 'DONE';
-    this.taskService.updateTask(task.id, { status: newStatus }).subscribe({
-      next: () => this.loadTasks()
-    });
-  }
+ toggleDone(task: any) {
+  const newStatus = task.status === 'DONE' ? 'PENDING' : 'DONE';
+  
+ this.taskService.updateTask(task.id, { status: newStatus }).subscribe({
+    next: () => this.loadTasks(),
+    error: (err) => console.error(err)
+  });
+}
   
   filter = signal<'ALL' | 'PENDING' | 'DONE'>('ALL');
   filteredTasks = computed(() => {

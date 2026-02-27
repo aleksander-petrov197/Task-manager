@@ -16,17 +16,17 @@ export class TasksService {
     if (!task) throw new NotFoundException(`Task with id ${id} not found`);
     return task;
   }
-async update(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {
-  // 1. Log exactly what the service sees
-  console.log(`Updating Task ${id} with:`, updateTaskDto);
+async update(id: number, updateTaskDto: any) {
+  console.log('Force updating ID:', id, 'with data:', updateTaskDto);
 
-  // 2. Direct update to the database
-  await this.taskRepository.update(id, {
-    title: updateTaskDto.title,
-    position: updateTaskDto.position // Force the position write
-  });
+ 
+  await this.taskRepository
+    .createQueryBuilder()
+    .update(Task)
+    .set(updateTaskDto) 
+    .where("id = :id", { id })
+    .execute();
 
-  // 3. Return the updated task
   return this.findOne(id);
 }
   async remove(id: number): Promise<Task> {
@@ -62,7 +62,7 @@ async update(id: number, updateTaskDto: UpdateTaskDto): Promise<Task> {
     return await this.taskRepository.save(newTask);
   }
 async reorderTasks(ids: number[]) {
-  // Loop through the IDs and update their positions in one go
+
   const updates = ids.map((id, index) => 
     this.taskRepository.update(id, { position: index })
   );

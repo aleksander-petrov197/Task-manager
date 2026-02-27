@@ -12,4 +12,8 @@ duedate?: string;
 @IsNumber()
 position?: number;
 
+@IsOptional()
+@IsString()
+status?: string;
+
 }
