@@ -3,12 +3,18 @@
     <h1>Task Tracker</h1>
     <button class="btn-logout" (click)="onLogout()">Logout</button>
   </div>
-
-  <div class="add-task">
-    <input type="text" [(ngModel)]="newTaskTitle" name="newTask" placeholder="Add a new task..." (keyup.enter)="addTask()">
-    <input type="date" [(ngModel)]="newTaskDate" [min]="minDate" name="dueDate">
-    <button class="btn-add" (click)="addTask()" [disabled]="!newTaskTitle || !newTaskTitle.trim()">Add</button>
+@if (errorMessage) {
+  <div class="error-message">
+    {{ errorMessage }}
+    <span class="close-error" (click)="errorMessage = null">×</span>
   </div>
+}
+ <div class="add-task">
+  <input type="text" [(ngModel)]="newTaskTitle" name="newTask" placeholder="Add a new task..." (keyup.enter)="addTask()">
+  <input type="date" [(ngModel)]="newTaskDate" [min]="minDate" name="dueDate">
+  
+  <button class="btn-add" (click)="addTask()">Add</button>
+</div>
 
   <div class="filter-controls">
     <button [class.active]="filter() === 'ALL'" (click)="setFilter('ALL')">All</button>

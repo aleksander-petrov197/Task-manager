@@ -15,6 +15,7 @@ export class TaskListComponent implements OnInit {
   title = 'task-tracker'
   tasks = signal<any[]>([]);
   newTaskTitle = '';
+  errorMessage: string |null = null;
   newTaskDate: string = '';
   minDate: string = new Date().toISOString().split('T')[0];
   constructor(private taskService: TaskService, private router: Router) { }
@@ -38,18 +39,35 @@ export class TaskListComponent implements OnInit {
     error: (err) => console.error('Could not load tasks', err)
   });
 }
-  addTask() {
-    console.log('Add button clicked! Current title:', this.newTaskTitle);
-    if (!this.newTaskTitle || !this.newTaskTitle.trim()) {
-    alert("Please enter a task title."); 
+
+
+addTask() {
+  this.errorMessage = null; // Clear previous errors
+
+  // 1. Check for Title
+  if (!this.newTaskTitle || !this.newTaskTitle.trim()) {
+    this.errorMessage = "Please enter a task title.";
     return;
   }
-    this.taskService.addTask(this.newTaskTitle, this.newTaskDate).subscribe(() => {
+
+  // 2. Check for Date (if you want the year/date to be mandatory)
+  if (!this.newTaskDate) {
+    this.errorMessage = "Please select a due date.";
+    return;
+  }
+
+  // 3. If both are present, call the service
+  this.taskService.addTask(this.newTaskTitle, this.newTaskDate).subscribe({
+    next: () => {
       this.newTaskTitle = '';
       this.newTaskDate = '';
-      this.loadTasks()
-    })
-  }
+      this.loadTasks();
+    },
+    error: (err) => {
+      this.errorMessage = "Server error. Could not save task.";
+    }
+  });
+}
 saveEdit(task: any) {
   if (!this.newTaskTitle || !this.newTaskTitle.trim()) {
     alert("Please enter a task title."); 
@@ -66,6 +84,14 @@ saveEdit(task: any) {
   });
 }
   deleteTask(id: number) {
+    const confirmed = window.confirm('Are you sure you want to delete this task? This cannot be undone.');
+
+  if (confirmed) {
+    this.taskService.deleteTask(id).subscribe({
+      next: () => this.loadTasks(),
+      error: (err) => (this.errorMessage = "Could not delete task.")
+    });
+  }
     this.taskService.deleteTask(id).subscribe(() => this.loadTasks());
   }
   toggleDone(task: any) {
@@ -109,18 +135,18 @@ saveEdit(task: any) {
     return dueDate < today;
   }
  drop(event: CdkDragDrop<any[]>) {
-  // 1. Get a copy of the current tasks
+
   const currentTasks = [...this.tasks()];
   
-  // 2. Move the item in the local array
+ 
   moveItemInArray(currentTasks, event.previousIndex, event.currentIndex);
   
-  // 3. Update the UI Signal immediately
+
   this.tasks.set(currentTasks);
 
-  // 4. THE FIX: Loop through all tasks and sync their NEW positions to the DB
+  
   currentTasks.forEach((task, index) => {
-    // We call your service's updateTask for EVERY item in the list
+   
     this.taskService.updateTask(task.id, { position: index }).subscribe({
       next: () => console.log(`Task ${task.id} is now position ${index}`),
       error: (err) => console.error('Error syncing position', err)
