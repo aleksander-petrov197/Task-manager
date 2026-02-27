@@ -1,0 +1,34 @@
+<div class="container">
+  <div class="header-row">
+    <h1>Task Tracker</h1>
+    <button class="btn-logout" (click)="onLogout()">Logout</button>
+  </div>
+
+  <div class="add-task">
+    <input type="text" [(ngModel)]="newTaskTitle" name="newTask" placeholder="Add a new task..." (keyup.enter)="addTasks()">
+    <button class="btn-add" (click)="addTasks()">Add</button>
+  </div>
+
+  <div class="filter-controls">
+    <button [class.active]="filter() === 'ALL'" (click)="setFilter('ALL')">All</button>
+    <button [class.active]="filter() === 'PENDING'" (click)="setFilter('PENDING')">Pending</button>
+    <button [class.active]="filter() === 'DONE'" (click) = "setFilter('DONE')">Done</button>
+  </div>
+
+  <ul>
+    @for (task of filteredTasks(); track task.id) {
+      <li [class.completed]="task.status === 'DONE'">
+        <div class="task-info">
+          <input type="checkbox" [checked]="task.status === 'DONE'" (change)="toggleDone(task)">
+          <span>{{ task.title }}</span>
+        </div>
+        <div class="actions">
+          <button class="btn-edit" (click)="editTask(task)">Edit</button>
+          <button class="btn-delete" (click)="deleteTask(task.id)">Delete</button>
+        </div>
+      </li>
+    } @empty {
+      <p style="text-align: center; color: #94a3b8; font-size: 14px;">Your list is empty!</p>
+    }
+  </ul>
+</div>

@@ -1,0 +1,9 @@
+body {
+  background-color: #f0f2f5; /* Light grey-blue background */
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}

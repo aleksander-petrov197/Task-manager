@@ -1,0 +1,39 @@
+<div class="container">
+    <div class="register-card">
+        <h2>Create Account</h2>
+
+        @if (errorMessage) {
+        <div class="error-banner">
+            {{ errorMessage }}
+        </div>
+        }
+
+        <div class="form-group">
+            <input type="email" [(ngModel)]="email" #emailVar="ngModel" (input)="errorMessage = ''"
+                (focus)="emailVar.control.markAsUntouched()" required email placeholder="Email">
+            <span *ngIf="emailVar.invalid && emailVar.touched" style="color: red;">
+                Invalid email format
+            </span>
+        </div>
+
+        <div class="form-group">
+            <input type="password" [(ngModel)]="password" #passVar="ngModel" required minlength="8"
+                (input)="errorMessage = ''" (focus)="passVar.control.markAsUntouched()"
+                placeholder="Password (min 8 chars)">
+            <span *ngIf="passVar.errors?.['minlength'] && passVar.touched" style="color: red;">
+                Password too short! (Minimum 8 characters)
+            </span>
+        </div>
+
+        <button [disabled]="emailVar.invalid || passVar.invalid" (click)="onRegister()">
+            Register
+        </button>
+        <span *ngIf="email && password && email === password" class="error-text">
+            Security Alert: Your password cannot match your email.
+        </span>
+
+        <div class="login-link">
+            Already have an account? <a routerLink="/login">Login here</a>
+        </div>
+    </div>
+</div>
